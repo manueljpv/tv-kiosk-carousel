@@ -1,0 +1,15 @@
+# Carousel schedule (cron of the "kiosk" user). Edit with: crontab -e
+# Format: minute hour day-of-month month day-of-week   (1-5 = Monday to Friday)
+
+# Language of the welcome/goodbye screens: en, pt or es
+KIOSK_LANG=en
+
+# TV carousel: starts at 08:00 and stops at 18:00 (Monday to Friday)
+0 8 * * 1-5 /home/kiosk/kiosk/start.sh
+0 18 * * 1-5 /home/kiosk/kiosk/stop.sh
+
+# Welcome and goodbye screens (20 s each)
+# Cron only works in minutes; "sleep" adjusts the seconds.
+0 8 * * 1-5 sleep 15; /home/kiosk/kiosk/notice.sh welcome
+0 13 * * 1-5 /home/kiosk/kiosk/notice.sh welcome
+59 17 * * 1-5 sleep 40; /home/kiosk/kiosk/notice.sh goodbye

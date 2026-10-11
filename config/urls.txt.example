@@ -1,0 +1,10 @@
+# One URL per line. Each line becomes a tab; the order is the carousel order.
+# Blank lines and lines starting with # are ignored.
+# Copy this file to ~/kiosk/urls.txt and adjust it.
+#
+# WARNING: URLs that carry a token (such as shared dashboards) are secrets.
+# Never publish your real urls.txt; it is excluded from the repository (.gitignore).
+
+http://192.0.2.10:8080/?tv=1
+https://glpi.example.com/front/central.php?embed&dashboard=assistance&token=YOUR_TOKEN_HERE
+https://glpi.example.com/dashboard-glpi/

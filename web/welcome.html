@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Welcome</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--
+  tv-kiosk-carousel - Copyright (C) 2026 Manuel Pérez - GPL-3.0-or-later
+
+  Welcome / goodbye screen for the carousel (single file, works offline).
+
+  Options in the URL:
+    welcome.html?mode=welcome            (default) or  ?mode=goodbye
+    welcome.html?lang=en                 messages in English (default), pt or es
+
+  To test in a browser, simulate the weekday (0 = Sunday ... 5 = Friday):
+    welcome.html?mode=goodbye&lang=pt&day=3      (ordinary day)
+    welcome.html?mode=goodbye&lang=pt&day=5      (Friday)
+
+  Customizing: company name in COMPANY, texts in the TEXTS table, logo in the
+  <svg> block (replace it with your own SVG or an <img>), colors in :root.
+-->
+<style>
+  :root {
+    --bg-1: #0b1f3a;
+    --bg-2: #12335f;
+    --text: #ffffff;
+    --text-soft: rgba(255,255,255,.78);
+    --accent: #4aa3ff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: "Segoe UI", "DejaVu Sans", Arial, sans-serif;
+    color: var(--text);
+    background: radial-gradient(ellipse at 30% 20%, var(--bg-2) 0%, var(--bg-1) 70%);
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden; cursor: none;
+  }
+  main {
+    width: 100%; max-width: 1500px; padding: 0 6vw;
+    text-align: center;
+    animation: enter 1.2s ease-out both;
+  }
+  @keyframes enter {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: none; }
+  }
+  /* Sizes use the smaller of width/height so everything fits on any screen */
+  .logo { width: min(14vw, 20vh); margin: 0 auto 3vh; display: block; }
+  .line { width: 120px; height: 4px; margin: 0 auto 3vh; border-radius: 2px; background: var(--accent); }
+  h1 { font-size: min(5.5vw, 9vh); font-weight: 300; letter-spacing: .02em; line-height: 1.15; margin-bottom: 2vh; }
+  p.message { font-size: min(2.6vw, 4.2vh); color: var(--text-soft); margin-bottom: 5vh; }
+  .time { font-size: min(7vw, 12vh); font-weight: 200; line-height: 1; letter-spacing: .04em; }
+  .date { font-size: min(2vw, 3.4vh); margin-top: 2vh; color: var(--text-soft); }
+</style>
+</head>
+<body>
+<main>
+  <!-- Generic logo: replace with your organization's logo -->
+  <svg class="logo" viewBox="0 0 200 200" role="img" aria-label="Logo">
+    <rect x="10" y="10" width="180" height="180" rx="28" fill="none" stroke="#ffffff" stroke-width="6"/>
+    <text x="100" y="118" text-anchor="middle" font-family="Arial, sans-serif"
+          font-size="52" font-weight="700" fill="#ffffff" letter-spacing="4">LOGO</text>
+  </svg>
+  <div class="line"></div>
+  <h1 id="greeting"></h1>
+  <p class="message" id="message"></p>
+  <div class="time" id="time"></div>
+  <div class="date" id="date"></div>
+</main>
+
+<script>
+  var COMPANY = "Example Company";
+
+  var TEXTS = {
+    en: {
+      locale: "en-US",
+      morning: "Good morning!", afternoon: "Good afternoon!", evening: "Good evening!",
+      welcome: "Welcome to " + COMPANY,
+      byeTitle: "Have a good rest!", byeMessage: "Thank you for the day's work. See you tomorrow.",
+      fridayTitle: "Have a great weekend!", fridayMessage: "Rest well. See you on Monday."
+    },
+    pt: {
+      locale: "pt-BR",
+      morning: "Bom dia!", afternoon: "Boa tarde!", evening: "Boa noite!",
+      welcome: "Seja bem-vindo à " + COMPANY,
+      byeTitle: "Bom descanso!", byeMessage: "Obrigado pelo dia de trabalho. Nos vemos amanhã.",
+      fridayTitle: "Excelente final de semana!", fridayMessage: "Bom descanso. Nos vemos na segunda-feira."
+    },
+    es: {
+      locale: "es-HN",
+      morning: "¡Buenos días!", afternoon: "¡Buenas tardes!", evening: "¡Buenas noches!",
+      welcome: "Bienvenido a " + COMPANY,
+      byeTitle: "¡Que descansen!", byeMessage: "Gracias por el trabajo de hoy. Nos vemos mañana.",
+      fridayTitle: "¡Excelente fin de semana!", fridayMessage: "Que descansen. Nos vemos el lunes."
+    }
+  };
+
+  var params = new URLSearchParams(location.search);
+  var mode = params.get("mode") === "goodbye" ? "goodbye" : "welcome";
+  var lang = TEXTS[params.get("lang")] ? params.get("lang") : "en";
+  var T = TEXTS[lang];
+  document.documentElement.lang = T.locale;
+
+  function weekday() {
+    var d = params.get("day");
+    return d !== null && d !== "" ? parseInt(d, 10) : new Date().getDay();
+  }
+
+  function update() {
+    var now = new Date();
+    var h = now.getHours();
+    var greeting, message;
+
+    if (mode === "welcome") {
+      greeting = h < 12 ? T.morning : (h < 18 ? T.afternoon : T.evening);
+      message = T.welcome;
+    } else if (weekday() === 5) {              // Friday
+      greeting = T.fridayTitle;
+      message = T.fridayMessage;
+    } else {
+      greeting = T.byeTitle;
+      message = T.byeMessage;
+    }
+
+    document.getElementById("greeting").textContent = greeting;
+    document.getElementById("message").textContent = message;
+    document.getElementById("time").textContent =
+      now.toLocaleTimeString(T.locale, { hour: "2-digit", minute: "2-digit", hour12: false });
+    var dateText = now.toLocaleDateString(T.locale, { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+    document.getElementById("date").textContent = dateText.charAt(0).toUpperCase() + dateText.slice(1);
+  }
+
+  update();
+  setInterval(update, 1000);
+</script>
+</body>
+</html>

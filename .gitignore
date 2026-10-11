@@ -1,0 +1,25 @@
+# Real URL list: may contain access tokens. Only urls.txt.example is versioned.
+urls.txt
+**/urls.txt
+
+# Chrome profile and runtime files
+chrome-profile/
+*.log
+*.pid
+/tmp/
+
+# Secrets of any kind
+*.key
+*.pem
+*.token
+.env
+.env.*
+secrets/
+
+# Backups and editor files
+*.bak
+*.bak-*
+*~
+*.swp
+.DS_Store
+Thumbs.db

@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Kiosk
+Exec=/home/kiosk/kiosk/auto.sh
+X-GNOME-Autostart-Enabled=true
+X-GNOME-Autostart-Delay=10
+NoDisplay=true
